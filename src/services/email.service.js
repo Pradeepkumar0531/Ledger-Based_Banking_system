@@ -4,6 +4,7 @@ const transporter = nodemailer.createTransport({
     service : 'gmail',
     auth : {
         type : "OAuth2",
+        user : process.env.EMAIL_USER,
         clientId : process.env.CLIENT_ID,
         clientSecret : process.env.CLIENT_SECRET,
         refreshToken : process.env.REFRESH_TOKEN,
@@ -32,3 +33,15 @@ const sendEmail = async (to, subject, text, html)=>{
         console.error("Error while sending mails", error);
     }
 }
+
+async function sendRegistrationEmail(userEmail, name){
+    const subject = "Welcome To Backend Ledger"
+    const text = `Hello ${name}\n\n Thank you for registering in Backend Ledger.\n We are delighted to have you on board.\n Best regards,\n Team Backend Ledger`
+    const html = `<p> Hello ${name}</p><p>Thank you for registering in Backend Ledger</p>`
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
+module.exports ={
+    sendRegistrationEmail
+};
