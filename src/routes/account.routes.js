@@ -6,4 +6,8 @@ const accountRoutes = express.Router();
 
 accountRoutes.post("/", authMiddleware.authMiddleware, accountController.createAccountController);
 
+accountRoutes.get("/", authMiddleware.authMiddleware, accountController.getUserAccountsController);
+
+accountRoutes.get("/balance/:accountId", authMiddleware.authMiddleware, accountController.getAccountBalanceController)
+
 module.exports = accountRoutes

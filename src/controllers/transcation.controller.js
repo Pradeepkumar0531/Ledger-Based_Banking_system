@@ -10,7 +10,7 @@ async function createTransaction(req, res){
     // 1. Validate Request
     if (!fromAccount || !toAccount || !amount || !idempotencyKey){
         return res.status(400).json({
-            message: "fromAccount, toAccount, amout, idempotencyKey are required"
+            message: "fromAccount, toAccount, amount, idempotencyKey are required"
         });
     }
     
@@ -73,36 +73,53 @@ async function createTransaction(req, res){
     }
 
     //5. Create Transaction
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    let transaction;
+    try{
 
-    const transaction = await transactionModel.create({
-        fromAccount,
-        toAccount,
-        amount,
-        idempotencyKey,
-        status : "PENDING"
-    },{session});
-
-    const debitLedgerEntry = await ledgerModel.create({
-        account : fromAccount,
-        amount : amount,
-        transaction : transaction._id,
-        type : "DEBIT"
-    },{session});
-
-    const creditLedgerEntry = await ledgerModel.create({
-        account : toAccount,
-        amount : amount,
-        transaction : transaction._id,
-        type : "CREDIT"
-    }, {session});
-
-    transaction.status = "COMPLETED";
-    await transaction.save({session});
-
-    await session.commitTransaction();
-    session.endSession();
+        const session = await mongoose.startSession();
+        session.startTransaction();
+    
+        transaction = (await transactionModel.create([{
+            fromAccount,
+            toAccount,
+            amount,
+            idempotencyKey,
+            status : "PENDING"
+        }],{session}))[0]
+    
+        const debitLedgerEntry = await ledgerModel.create([{
+            account : fromAccount,
+            amount : amount,
+            transaction : transaction._id,
+            type : "DEBIT"
+        }],{session});
+        
+        await (()=>{
+            return new Promise((resolve) => setTimeout(resolve, 15 * 1000))
+        })()
+    
+        const creditLedgerEntry = await ledgerModel.create([{
+            account : toAccount,
+            amount : amount,
+            transaction : transaction._id,
+            type : "CREDIT"
+        }], {session});
+    
+        await transactionModel.findOneAndUpdate(
+            {_id: transaction._id},
+            {status: "COMPLETED"},
+            {session}
+        )
+        await transaction.save({session});
+    
+        await session.commitTransaction();
+        session.endSession();
+    }
+    catch(error){
+        return res.status(400).json({
+            message: "Transaction is Pending due to some issue, please wait"
+        })
+    }
 
     // 10. Email service
     await emailService.sendTransactionEmail(req.user.email, req.user.name, amount, toAccount);
