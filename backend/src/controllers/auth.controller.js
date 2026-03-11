@@ -22,7 +22,7 @@ async function userRegisterController(req, res){
         email, password, name
     })
 
-    const token = jwt.sign({user: user._id},process.env.JWT_SECRET, {expiresIn: "3d"});
+    const token = jwt.sign({userId: user._id},process.env.JWT_SECRET, {expiresIn: "3d"});
     res.cookie("token", token);
     res.status(201).json({
         user:{
@@ -64,7 +64,7 @@ async function userLoginController(req, res){
 }
 
 async function userLogoutController(req, res){
-    const token = req.cookies.token || req.authorization?.split(" ")[1]
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1]
 
     if (!token){
         return res.status(400).json({

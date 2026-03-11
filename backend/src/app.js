@@ -1,5 +1,6 @@
 const express = require("express"); // import express from "express";
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const app = express();
 
@@ -10,12 +11,11 @@ const authRouter = require("./routes/auth.routes");
 const accountRouter = require("./routes/account.routes");
 const transactionRouter = require("./routes/transaction.routes");
 
-app.get('/',(req, res)=>{
-    res.send("Ledger is up and running")
-})
+// Serve static files from frontend directory
+app.use(express.static(path.join(__dirname, "../../frontend")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountRouter);
-app.use("/api/transactions",transactionRouter)
+app.use("/api/transactions", transactionRouter);
 
 module.exports = app;
