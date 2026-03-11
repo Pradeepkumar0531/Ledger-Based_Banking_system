@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerPay — Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-page">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-logo">&#x29C6;</span>
+            <span>LedgerPay</span>
+        </div>
+        <div class="nav-right">
+            <span class="nav-user">Hello, <strong id="navUserName">User</strong></span>
+            <button class="btn btn-outline btn-sm" onclick="logoutUser()">
+                <span>Sign Out</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+
+        <!-- Accounts Section -->
+        <section class="dash-section">
+            <div class="section-header">
+                <h2>Accounts</h2>
+                <button class="btn btn-primary btn-sm" onclick="createAccount(this)">
+                    <span>+ New Account</span>
+                </button>
+            </div>
+            <p class="section-hint">Click an account card to copy its ID.</p>
+            <div id="accountsList"></div>
+        </section>
+
+        <!-- Balance Checker Section -->
+        <section class="dash-section">
+            <div class="section-header">
+                <h2>Check Balance</h2>
+            </div>
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label for="balanceAccountId">Account ID</label>
+                    <input type="text" id="balanceAccountId" placeholder="Paste account ID here">
+                </div>
+                <div class="form-group form-group-btn">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="getBalance(this)">
+                        <span>Check Balance</span>
+                    </button>
+                </div>
+            </div>
+            <div id="balanceResult" class="balance-result hidden"></div>
+        </section>
+
+        <!-- Transfer Section -->
+        <section class="dash-section">
+            <div class="section-header">
+                <h2>Transfer Funds</h2>
+            </div>
+            <div class="form-group">
+                <label for="fromAccount">From Account ID</label>
+                <input type="text" id="fromAccount" placeholder="Sender account ID">
+            </div>
+            <div class="form-group">
+                <label for="toAccount">To Account ID</label>
+                <input type="text" id="toAccount" placeholder="Recipient account ID">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount (INR)</label>
+                <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01">
+            </div>
+            <button class="btn btn-primary" onclick="createTransaction(this)">
+                <span>&#x27A4; Send Money</span>
+            </button>
+        </section>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/account.js"></script>
+    <script src="js/transaction.js"></script>
+</body>
+</html>
